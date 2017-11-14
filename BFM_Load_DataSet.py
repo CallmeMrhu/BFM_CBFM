@@ -16,7 +16,6 @@ def sortData(path, dataset):
     print(' ')
     return file_df
 
-
 # user 、 item 的字典
 def createDict(sortdata):
     user_dict = {}
