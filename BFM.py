@@ -32,9 +32,11 @@ class FM():
     def __init__(self, num_user, num_item, n_iter, k_dim, learning_rate, alpha0, alpha1, alpha2, dataset, label):
         self.w0 = np.random.random()
         # self.w = np.zeros(num_user + num_item)
-        self.w = np.zeros(num_user + num_item + num_item)
+        # self.w = np.zeros(num_user + num_item + num_item)
+        self.w = np.random.random(num_user + num_item + num_item)
         # self.v = np.zeros([num_user + num_item, num_user + num_item])
-        self.v = np.zeros([num_user + num_item + num_item, k_dim])
+        # self.v = np.zeros([num_user + num_item + num_item, k_dim])
+        self.v = np.random.random((num_user + num_item + num_item, k_dim))
         self.num_user = num_user
         self.num_item = num_item
         self.n_iter = n_iter
@@ -67,6 +69,8 @@ class FM():
                     if label[row] == 1:
                         w[i] = np.random.random()
                         v[i][f] = np.random.random()
+
+        # 随机初始化
 
         # 迭代开始
         for step in range(step):
@@ -104,10 +108,11 @@ class FM():
                     i = dataset[row][column]
                     for f in range(k_dim):
                         # 梯度计算结果好像有问题
-                        gradient_k2 = intermediate * (Vjk[f] - v[i][f]) + 2 * alpha2 * v[i][f]
-                        v[i][f] -= learning_rate * gradient_k2
-                    gradient_k0 = 1 + 2 * alpha0 * k0
-                    gradient_k1 = 1 + 2 * alpha1 * w[i]
+                        gradient_k2 = (-1) * intermediate * (Vjk[f] - v[i][f]) + 2 * alpha2 * v[i][f]
+                        # 11.26 by hucheng
+                        v[i][f] = v[i][f] - learning_rate * gradient_k2
+                    gradient_k0 = -1 + 2 * alpha0 * k0
+                    gradient_k1 = -1 + 2 * alpha1 * w[i]
                     k0 -= learning_rate * gradient_k0
                     w[i] -= learning_rate * gradient_k1
 
@@ -207,7 +212,7 @@ if __name__ == '__main__':
     # num_item = len(item_dict)
     num_user = 32266
     num_item = 23812
-
+    # num_user, num_item, n_iter, k_dim, learning_rate, alpha0, alpha1, alpha2, dataset, label
     fm = FM(num_user, num_item, 50, 8, 0.0001, 0.01, 0.01, 0.01, dataset, label)
     k0, w, v = fm.train()
 

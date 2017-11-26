@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # fc.close()
     # f.close()
     # ------------#
-    # file = open('TaFeng/train_textFormat.csv')
+    # file = open('TaFeng/train_textFormat1.csv')
     # m = np.array([])
     # print(m)
     # suma = []
