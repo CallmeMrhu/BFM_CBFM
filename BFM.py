@@ -62,13 +62,13 @@ class FM():
         alpha1 = self.alpha1
         alpha2 = self.alpha2
         # 对存在关系的潜在因子随机化
-        for row in range(len(dataset)):
-            for column in range(len(dataset[row])):
-                for f in range(k_dim):
-                    i = dataset[row][column]
-                    if label[row] == 1:
-                        w[i] = np.random.random()
-                        v[i][f] = np.random.random()
+        # for row in range(len(dataset)):
+        #     for column in range(len(dataset[row])):
+        #         for f in range(k_dim):
+        #             i = dataset[row][column]
+        #             if label[row] == 1:
+        #                 w[i] = np.random.random()
+        #                 v[i][f] = np.random.random()
 
         # 随机初始化
 
@@ -108,46 +108,49 @@ class FM():
                     i = dataset[row][column]
                     for f in range(k_dim):
                         # 梯度计算结果好像有问题
-                        gradient_k2 = (-1) * intermediate * (Vjk[f] - v[i][f]) + 2 * alpha2 * v[i][f]
+                        gradient_k2 = intermediate * (Vjk[f] - v[i][f])/2.0 + 2 * alpha2 * v[i][f]
                         # 11.26 by hucheng
                         v[i][f] = v[i][f] - learning_rate * gradient_k2
-                    gradient_k0 = -1 + 2 * alpha0 * k0
-                    gradient_k1 = -1 + 2 * alpha1 * w[i]
+                    gradient_k0 = intermediate + 2 * alpha0 * k0
+                    gradient_k1 = intermediate + 2 * alpha1 * w[i]
                     k0 -= learning_rate * gradient_k0
                     w[i] -= learning_rate * gradient_k1
 
             # 计算OPT_BFM(T)
+            print("TRAIN OVER")
 
-            opt_bfm = 0
-            for row in range(len(dataset)):
-                k1 = 0
-                k2 = 0
-                reg = 0
-                reg1 = 0
-                reg2 = 0
-                for f in range(k_dim):
-                    sum_one = 0
-                    sum_two = 0
-                    for column in range(len(dataset[row])):
-                        i = dataset[row][column]
-                        sum_one += v[i][f]
-                        sum_two += pow(v[i][f], 2)
-                    result = (pow(sum_one, 2) - sum_one) * 0.5
-                    k2 = k2 + result
-                    reg2 += alpha2 * v[i][f] ** 2
-                reg1 = w[i] ** 2
-                y = k0 + k1 + k2
+            if(step%5==0):
+                opt_bfm = 0
+                for row in range(len(dataset)):
+                    k1 = 0
+                    k2 = 0
+                    reg = 0
+                    reg1 = 0
+                    reg2 = 0
+                    for f in range(k_dim):
+                        sum_one = 0
+                        sum_two = 0
+                        for column in range(len(dataset[row])):
+                            i = dataset[row][column]
+                            sum_one += v[i][f]
+                            sum_two += pow(v[i][f], 2)
+                        result = (pow(sum_one, 2) - sum_two) * 0.5
+                        k2 = k2 + result
+                        reg2 += alpha2 * v[i][f] ** 2
+                    reg1 = w[i] ** 2
+                    y = k0 + k1 + k2
 
-                log_result = np.log(logistic.cdf(y * label[row]))
-                # print(log_result)
-                reg = reg1 + reg2
-                opt_bfm -= log_result
-                opt_bfm += reg
+                    log_result = np.log(logistic.cdf(y * label[row]))
+                    # print(log_result)
+                    reg = reg1 + reg2
+                    opt_bfm -= log_result
+                    opt_bfm += reg
 
-            opt_bfm += k0 ** 2
-            print(opt_bfm)
+                opt_bfm += k0 ** 2
+                print(opt_bfm)
 
-            print(step, ' has finished,')
+                print(step, ' has finished,')
+
         return k0, w, v
 
 

@@ -132,6 +132,8 @@ def createTextFormat(baskets, user_length, item_length, user_items, path, train_
                                 else:
                                     # basket_content = basket_content + str(M + item_id) + ':1 '
                                     # item_num += 1
+                                    # 随机采样的item值需要进行判断，是否与之前的item同时出过
+                                    # 包括目标item和basket中已存在的item
                                     item_num += 1
                                     if item_num == basket_lenth:
                                         basket_content = basket_content + str(M + item_id)
