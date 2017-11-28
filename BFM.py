@@ -29,7 +29,7 @@ class FM():
     # learning_rate: int
 
 
-    def __init__(self, num_user, num_item, n_iter, k_dim, learning_rate, alpha0, alpha1, alpha2, dataset, label):
+    def __init__(self, num_user, num_item, n_iter, k_dim, learning_rate, lamada , dataset, label):
         self.w0 = np.random.random()
         # self.w = np.zeros(num_user + num_item)
         # self.w = np.zeros(num_user + num_item + num_item)
@@ -42,9 +42,7 @@ class FM():
         self.n_iter = n_iter
         self.k_dim = k_dim
         self.learning_rate = learning_rate
-        self.alpha0 = alpha0  # regularization parameter
-        self.alpha1 = alpha1  # regularization parameter
-        self.alpha2 = alpha2  # regularization parameter
+        self.lamada = lamada  # regularization parameter
         self.dataset = dataset
         self.label = label
 
@@ -58,9 +56,7 @@ class FM():
         k_dim = self.k_dim
         step = self.n_iter
         learning_rate = self.learning_rate
-        alpha0 = self.alpha0
-        alpha1 = self.alpha1
-        alpha2 = self.alpha2
+        lamada = self.lamada
         # 对存在关系的潜在因子随机化
         # for row in range(len(dataset)):
         #     for column in range(len(dataset[row])):
@@ -108,11 +104,11 @@ class FM():
                     i = dataset[row][column]
                     for f in range(k_dim):
                         # 梯度计算结果好像有问题
-                        gradient_k2 = intermediate * (Vjk[f] - v[i][f])/2.0 + 2 * alpha2 * v[i][f]
+                        gradient_k2 = intermediate * (Vjk[f] - v[i][f])/2.0 + 2 * lamada * v[i][f]
                         # 11.26 by hucheng
                         v[i][f] = v[i][f] - learning_rate * gradient_k2
-                    gradient_k0 = intermediate + 2 * alpha0 * k0
-                    gradient_k1 = intermediate + 2 * alpha1 * w[i]
+                    gradient_k0 = intermediate + 2 * lamada * k0
+                    gradient_k1 = intermediate + 2 * lamada * w[i]
                     k0 -= learning_rate * gradient_k0
                     w[i] -= learning_rate * gradient_k1
 
@@ -136,8 +132,8 @@ class FM():
                             sum_two += pow(v[i][f], 2)
                         result = (pow(sum_one, 2) - sum_two) * 0.5
                         k2 = k2 + result
-                        reg2 += alpha2 * v[i][f] ** 2
-                    reg1 = w[i] ** 2
+                        reg2 += lamada * v[i][f] ** 2
+                    reg1 = lamada * w[i] ** 2
                     y = k0 + k1 + k2
 
                     log_result = np.log(logistic.cdf(y * label[row]))
@@ -146,7 +142,7 @@ class FM():
                     opt_bfm -= log_result
                     opt_bfm += reg
 
-                opt_bfm += k0 ** 2
+                opt_bfm += lamada * k0 ** 2
                 print(opt_bfm)
 
                 print(step, ' has finished,')
@@ -216,7 +212,7 @@ if __name__ == '__main__':
     num_user = 32266
     num_item = 23812
     # num_user, num_item, n_iter, k_dim, learning_rate, alpha0, alpha1, alpha2, dataset, label
-    fm = FM(num_user, num_item, 50, 8, 0.0001, 0.01, 0.01, 0.01, dataset, label)
+    fm = FM(num_user, num_item, 50, 8, 0.08, 0.01, dataset, label)
     k0, w, v = fm.train()
 
     k1 = 0
@@ -225,7 +221,7 @@ if __name__ == '__main__':
     validation_optive = [[271, 37157]]
     validation_negtive = [[5103, 40268]]
     # # validation = [[0,7]]
-    validation = np.array(validation_negtive)
+    validation = np.array(validation_optive)
     for row in range(len(validation)):
         for f in range(8):
             sum_one = 0
@@ -242,6 +238,7 @@ if __name__ == '__main__':
     a = logistic.cdf(y)
     # a = pow(1 + math.exp(y  * (-1)), -1)
     print(y)
+    # a 应该要无限接近为1
     print(a)
 
     print(k0)

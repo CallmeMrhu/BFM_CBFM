@@ -16,7 +16,6 @@ def sortData(path, dataset):
     print(' ')
     return file_df
 
-
 # user 、 item 的字典
 def createDict(sortdata):
     user_dict = {}
@@ -37,16 +36,10 @@ def createDict(sortdata):
 # user购买的所有item
 def createUserToItem(user_dict, item_length, sortdata):
     user_items = {}
-    item_num = {}
 
     for row in sortdata.itertuples():
         user_id = user_dict[row.b]
         item_id = item_dict[row.f]
-
-        if (item_id not in item_num.keys()):
-            item_num[item_id] = 1
-        else:
-            item_num[item_id] += 1
 
         if (user_id not in user_items.keys()):
             user_items[user_id] = []
@@ -54,7 +47,7 @@ def createUserToItem(user_dict, item_length, sortdata):
         else:
             user_items[user_id].append(item_id)
 
-    return user_items, item_num
+    return user_items
 
 
 # user的baskets
@@ -109,9 +102,9 @@ def createTextFormat(baskets, user_length, item_length, user_items, path, train_
                 for i in range(basket_lenth):
                     if i != index:
                         # basket_content = basket_content + str(M + basket[i]) + ':1 '
-                        if index != (basket_lenth - 1) and i == (basket_lenth - 1):
+                        if index !=(basket_lenth-1) and i == (basket_lenth-1):
                             basket_content = basket_content + str(M + basket[i])
-                        elif index == (basket_lenth - 1) and i == (basket_lenth - 2):
+                        elif index ==(basket_lenth-1) and i == (basket_lenth-2):
                             basket_content = basket_content + str(M + basket[i])
                         else:
                             basket_content = basket_content + str(M + basket[i]) + ','
@@ -122,29 +115,33 @@ def createTextFormat(baskets, user_length, item_length, user_items, path, train_
                 text_content_positive = '1,' + user_content + target_content + basket_content
                 train_TextFormat.write(text_content_positive + '\n')
                 # 如果是训练数据集，则每一条数据产生相同规格的负采样数据两条
-                # if (type == 'train'):
-                #     # do negtive sampling
-                #     # each positive item has two negtive items
-                #     for i in range(2):
-                #         item_num = 0
-                #         negtive_content = ''
-                #         basket_content = ''
-                #         while item_num < basket_lenth:
-                #             item_id = random.randint(0, item_length - 1)
-                #             if item_id not in user_items[user_id]:
-                #                 if item_num == 0:
-                #                     negtive_content = str(N + item_id) + ','
-                #                     item_num += 1
-                #                 else:
-                #                     # 随机采样的item值需要进行判断，是否与之前的item同时出过
-                #                     # 包括目标item和basket中已存在的item
-                #                     item_num += 1
-                #                     if item_num == basket_lenth:
-                #                         basket_content = basket_content + str(M + item_id)
-                #                     else:
-                #                         basket_content = basket_content + str(M + item_id) + ','
-                #         text_content_negative = '-1,' + user_content + negtive_content + basket_content
-                #         train_TextFormat.write(text_content_negative + '\n')
+                if (type == 'train'):
+                    # do negtive sampling
+                    # each positive item has two negtive items
+                    for i in range(2):
+                        item_num = 0
+                        negtive_content = ''
+                        basket_content = ''
+                        while item_num < basket_lenth:
+                            item_id = random.randint(0, item_length - 1)
+                            if item_id not in user_items[user_id]:
+                                if item_num == 0:
+                                    # negtive_content = str(N + item_id) + ':1 '
+                                    negtive_content = str(N + item_id) + ','
+                                    item_num += 1
+                                else:
+                                    # basket_content = basket_content + str(M + item_id) + ':1 '
+                                    # item_num += 1
+                                    # 随机采样的item值需要进行判断，是否与之前的item同时出过
+                                    # 包括目标item和basket中已存在的item
+                                    item_num += 1
+                                    if item_num == basket_lenth:
+                                        basket_content = basket_content + str(M + item_id)
+                                    else:
+                                        basket_content = basket_content + str(M + item_id) + ','
+                        # text_content_negative = '-1 ' + user_content + negtive_content + basket_content
+                        text_content_negative = '-1,' + user_content + negtive_content + basket_content
+                        train_TextFormat.write(text_content_negative + '\n')
 
     return
 
@@ -168,10 +165,7 @@ if __name__ == '__main__':
     sortdata_validation = sortData(path, validation_dataset)
     sortdata_test = sortData(path, test_dataset)
     # users have buy them
-    # every item occurrence time, be used for negative sampling
-    user_items, item_num = createUserToItem(user_dict, item_length, sortdata_train)
-    # sort item_num dict
-    # sort(item_num.items,key=lambda x:x[1] )
+    user_items = createUserToItem(user_dict, item_length, sortdata_train)
 
     baskets_train = createBasket(sortdata_train, user_dict, item_dict)
     print("baskets_train has been created!")
@@ -181,10 +175,10 @@ if __name__ == '__main__':
     print("baskets_test has been created!")
     print(' ')
 
-    # createTextFormat(baskets_train, user_length, item_length, user_items, path, train_dataset, 'train')
-    # print('create train TextFormat finished')
-    # createTextFormat(baskets_validation, user_length, item_length, user_items, path, validation_dataset, 'validation')
-    # print('create validation TextFormat finished')
-    # createTextFormat(baskets_test, user_length, item_length, user_items, path, test_dataset, 'test')
-    # print('create test TextFormat finished')
-    # print(' ')
+    createTextFormat(baskets_train, user_length, item_length, user_items, path, train_dataset, 'train')
+    print('create train TextFormat finished')
+    createTextFormat(baskets_validation, user_length, item_length, user_items, path, validation_dataset, 'validation')
+    print('create validation TextFormat finished')
+    createTextFormat(baskets_test, user_length, item_length, user_items, path, test_dataset, 'test')
+    print('create test TextFormat finished')
+    print(' ')
