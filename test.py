@@ -15,6 +15,7 @@ if __name__ == '__main__':
     # print(m)
     # -------------------#
     # #-------------------#
+    # all dataset
     # f = open('TaFeng/dataset.txt','a')
     # fa = open('TaFeng/test.txt','r')
     # fb = open('TaFeng/train.txt','r')
@@ -38,6 +39,16 @@ if __name__ == '__main__':
     # fa.close()
     # fb.close()
     # fc.close()
+    # f.close()
+    #------------------
+    # train dataset
+    # f = open('TaFeng/train.txt','a')
+    # fa = open('TaFeng/D01.txt','r')
+    # a = fa.readline()
+    # while a:
+    #     f.write(a)
+    #     a = fa.readline()
+    # fa.close()
     # f.close()
     # ------------#
     # file = open('TaFeng/train_textFormat1.csv')
@@ -100,6 +111,6 @@ if __name__ == '__main__':
     # intermediate = 1.0/a
 
     # a = math.exp(-711.945091687)
-
+    #
     b = np.random.random()
     print(b)
