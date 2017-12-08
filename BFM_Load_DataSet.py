@@ -185,11 +185,11 @@ if __name__ == '__main__':
     print("baskets_test has been created!")
     print(' ')
 
-    createTextFormat(baskets_train, user_length, item_length, user_items, path, train_dataset, 'train')
-    print('create train TextFormat finished')
-    createTextFormat(baskets_validation, user_length, item_length, user_items, path, validation_dataset, 'validation')
-    print('create validation TextFormat finished')
-    createTextFormat(baskets_test, user_length, item_length, user_items, path, test_dataset, 'test')
-    print('create test TextFormat finished')
-    print(' ')
+    # createTextFormat(baskets_train, user_length, item_length, user_items, path, train_dataset, 'train')
+    # print('create train TextFormat finished')
+    # createTextFormat(baskets_validation, user_length, item_length, user_items, path, validation_dataset, 'validation')
+    # print('create validation TextFormat finished')
+    # createTextFormat(baskets_test, user_length, item_length, user_items, path, test_dataset, 'test')
+    # print('create test TextFormat finished')
+    # print(' ')
 
