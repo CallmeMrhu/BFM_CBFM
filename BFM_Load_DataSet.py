@@ -3,11 +3,6 @@
 import random
 import pandas as pd
 
-
-
-
-
-
 # 对数据按照时间、user进行排序
 def sortData(path, dataset):
     filePath = path + '/' + dataset + '.txt'

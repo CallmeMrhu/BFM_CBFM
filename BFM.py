@@ -144,7 +144,6 @@ class FM():
 
                 opt_bfm += lamada * k0 ** 2
                 print(opt_bfm)
-
                 print(step, ' has finished,')
 
         return k0, w, v
@@ -217,7 +216,7 @@ if __name__ == '__main__':
 
     k1 = 0
     k2 = 0
-    #
+
     validation_optive = [[271, 37157]]
     validation_negtive = [[5103, 40268]]
     # # validation = [[0,7]]
