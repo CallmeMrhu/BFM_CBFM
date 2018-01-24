@@ -5,15 +5,10 @@
 
 import numpy as np
 from scipy.stats import logistic
-# import BFM_Load_DataSet
 
 
-# 先实现最简单的版本
-
-
-# 1、加载数据：第一列当作Y，第二列为user，第三列为target，后面为basket
+# 1、加载数据：第一列当作Y（label），第二列为user，第三列为target，后面为basket
 # 首先实现user与target之间的FM
-
 
 class FM():
     # Parameters
@@ -28,14 +23,9 @@ class FM():
     # max_target: double
     # learning_rate: int
 
-
-    def __init__(self, num_user, num_item, n_iter, k_dim, learning_rate, lamada , dataset, label):
+    def __init__(self, num_user, num_item, n_iter, k_dim, learning_rate, lamada, dataset, label):
         self.w0 = np.random.random()
-        # self.w = np.zeros(num_user + num_item)
-        # self.w = np.zeros(num_user + num_item + num_item)
         self.w = np.random.random(num_user + num_item + num_item)
-        # self.v = np.zeros([num_user + num_item, num_user + num_item])
-        # self.v = np.zeros([num_user + num_item + num_item, k_dim])
         self.v = np.random.random((num_user + num_item + num_item, k_dim))
         self.num_user = num_user
         self.num_item = num_item
@@ -50,36 +40,26 @@ class FM():
 
         dataset = self.dataset
         label = self.label
-
         w = self.w
         v = self.v
         k_dim = self.k_dim
         step = self.n_iter
         learning_rate = self.learning_rate
         lamada = self.lamada
-        # 对存在关系的潜在因子随机化
-        # for row in range(len(dataset)):
-        #     for column in range(len(dataset[row])):
-        #         for f in range(k_dim):
-        #             i = dataset[row][column]
-        #             if label[row] == 1:
-        #                 w[i] = np.random.random()
-        #                 v[i][f] = np.random.random()
-
-        # 随机初始化
 
         # 迭代开始
         for step in range(step):
             # 根据求导情况，需要求解vT中每一列的和
             # 每次迭代，重新计算Vjk
-            Vjk = {}
+            Vjk = np.zeros((len(dataset), k_dim))
             for k in range(k_dim):
                 sum_result = 0
                 for row in range(len(dataset)):
                     for column in range(len(dataset[row])):  # 只选择存在关系的
                         j = dataset[row][column]  # v矩阵中的行数
                         sum_result += v[j][k]
-                Vjk[k] = sum_result
+                    Vjk[row][k] = sum_result
+                    sum_result = 0
             # 根据对Vi,f进行求导，结果包含y的表达式，所以先求每个i下面的y值
             # y 的求解根据公式 （1.1）
             for row in range(len(dataset)):
@@ -103,106 +83,38 @@ class FM():
                 for column in range(len(dataset[row])):
                     i = dataset[row][column]
                     for f in range(k_dim):
-                        # 梯度计算结果好像有问题
-                        gradient_k2 = intermediate * (Vjk[f] - v[i][f])/2.0 + 2 * lamada * v[i][f]
+                        # 计算梯度，然后更新三个参数
+                        # 此处还要减去user与basket-item之间的组合关系
+                        gradient_k2 = intermediate * (Vjk[row][f] - v[i][f]) + 2 * lamada * v[i][f]
                         # 11.26 by hucheng
                         v[i][f] = v[i][f] - learning_rate * gradient_k2
                     gradient_k0 = intermediate + 2 * lamada * k0
                     gradient_k1 = intermediate + 2 * lamada * w[i]
                     k0 -= learning_rate * gradient_k0
                     w[i] -= learning_rate * gradient_k1
-
-            # 计算OPT_BFM(T)
-            print("TRAIN OVER")
-
-            if(step%5==0):
-                opt_bfm = 0
-                for row in range(len(dataset)):
-                    k1 = 0
-                    k2 = 0
-                    reg = 0
-                    reg1 = 0
-                    reg2 = 0
-                    for f in range(k_dim):
-                        sum_one = 0
-                        sum_two = 0
-                        for column in range(len(dataset[row])):
-                            i = dataset[row][column]
-                            sum_one += v[i][f]
-                            sum_two += pow(v[i][f], 2)
-                        result = (pow(sum_one, 2) - sum_two) * 0.5
-                        k2 = k2 + result
-                        reg2 += lamada * v[i][f] ** 2
-                    reg1 = lamada * w[i] ** 2
-                    y = k0 + k1 + k2
-
-                    log_result = np.log(logistic.cdf(y * label[row]))
-                    # print(log_result)
-                    reg = reg1 + reg2
-                    opt_bfm -= log_result
-                    opt_bfm += reg
-
-                opt_bfm += lamada * k0 ** 2
-                print(opt_bfm)
-                print(step, ' has finished,')
-
         return k0, w, v
 
 
 if __name__ == '__main__':
-    # dataset : np.ndarray
-    # 1 16760:1 36578:1 56343:1 69968:1 65583:1 56522:1 56500:1 57871:1
-    # 保存为这样1 16760 36578 56343 69968 65583 56522 56500 57871 list形式
-    # 假设数据集如此
-    # 1,0,0,0,0,0,0,1,0,0,0,1   [0，7，11]
-    # 0,1,0,0,1,0,0,0,0,1,0,0   [1，4，9]
-    # 0,0,1,0,0,1,0,0,0,0,1,0   [2，5，10]
-    # 0,0,0,1,0,0,1,0,1,0,0,0   [3，6，8]
-    # ----------------------------------
-    # [1,1,1,1]
-
-    # dataset = [
-    #         [0,7,11],
-    #         [1,4,9],
-    #         [2,5,10],
-    #         [3,6,8]
-    #     ]
-    # label = [1,1,1,1]
-    # -------------------------------------------
-    # dataset = [
-    #         [0,7,11],
-    #         [0,4,8],
-    #         [0,3,7],
-    #         [0,5,6],
-    #         [0,10,11],
-    #         [1,7,11],
-    #         [2,7,11],
-    #         [5,7,11],
-    #         [1,2]
-    #     ]
-    # print(type(dataset))
-    #
-    # label = [1,1,1,1,1,1,-1,1,1]
-    # -------------------------------------------
 
     file = open('TaFeng/train_textFormat.csv')
     dataset = list()
     label = list()
     line = file.readline()
     i = 1
-    while line:
+    while line.strip() != '':
         line = line.strip().split(',')
         dataLine = file.readline().strip().split(',')
-
         label.append(int(dataLine[0].strip()))
         data = list(map(eval, dataLine[1:-1]))
         dataset.append(data)
         line = file.readline()
 
-        if i == 10000:
-            break
-        else:
-            i += 1
+        #  为来训练时间断，先用10000行数据进行训练
+        #     if i == 10000:
+        #         break
+        #     else:
+        #         i += 1
     dataset = np.array(dataset)
 
     # user_dict,item_dict = BFM_Load_DataSet.createDict()
@@ -210,8 +122,10 @@ if __name__ == '__main__':
     # num_item = len(item_dict)
     num_user = 32266
     num_item = 23812
+    n_iter = 50
+    k_dim = 8
     # num_user, num_item, n_iter, k_dim, learning_rate, alpha0, alpha1, alpha2, dataset, label
-    fm = FM(num_user, num_item, 50, 8, 0.08, 0.01, dataset, label)
+    fm = FM(num_user, num_item, n_iter, k_dim, 0.08, 0.01, dataset, label)
     k0, w, v = fm.train()
 
     k1 = 0
@@ -236,10 +150,10 @@ if __name__ == '__main__':
         y = k0 + k1 + k2
     a = logistic.cdf(y)
     # a = pow(1 + math.exp(y  * (-1)), -1)
-    print(y)
+    print('y=', y)
     # a 应该要无限接近为1
-    print(a)
+    print('a=', a)
 
-    print(k0)
-    print(len(w))
-    print(len(v))
+    # print(k0)
+    # print(len(w))
+    # print(len(v))

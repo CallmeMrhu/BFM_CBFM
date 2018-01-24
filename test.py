@@ -112,5 +112,5 @@ if __name__ == '__main__':
 
     # a = math.exp(-711.945091687)
     #
-    b = np.random.random()
-    print(b)
+    b = np.random.random((10, 6))
+    print(b[1][3])

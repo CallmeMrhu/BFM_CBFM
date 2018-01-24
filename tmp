@@ -1,0 +1,67 @@
+ # if((step+1)%5==0):
+        #     opt_bfm = 0
+        #     for row in range(len(dataset)):
+        #         k1 = 0
+        #         k2 = 0
+        #         # reg = 0
+        #         # reg1 = 0
+        #         reg2 = 0
+        #         for f in range(k_dim):
+        #             sum_one = 0
+        #             sum_two = 0
+        #             for column in range(len(dataset[row])):
+        #                 i = dataset[row][column]
+        #                 sum_one += v[i][f]
+        #                 sum_two += pow(v[i][f], 2)
+        #             result = (pow(sum_one, 2) - sum_two) * 0.5
+        #             k2 = k2 + result
+        #             reg2 += lamada * v[i][f] ** 2
+        #         reg1 = lamada * w[i] ** 2
+        #         y = k0 + k1 + k2
+        #
+        #         log_result = np.log(logistic.cdf(y * label[row]))
+        #         # print(log_result)
+        #         reg = reg1 + reg2
+        #         opt_bfm -= log_result
+        #         opt_bfm += reg
+        #
+        #     opt_bfm += lamada * k0 ** 2
+        #     print(opt_bfm)
+        #     print(step, ' has finished,')
+
+
+
+# dataset : np.ndarray
+    # 1 16760:1 36578:1 56343:1 69968:1 65583:1 56522:1 56500:1 57871:1
+    # 保存为这样1 16760 36578 56343 69968 65583 56522 56500 57871 list形式
+    # 假设数据集如此
+    # 1,0,0,0,0,0,0,1,0,0,0,1   [0，7，11]
+    # 0,1,0,0,1,0,0,0,0,1,0,0   [1，4，9]
+    # 0,0,1,0,0,1,0,0,0,0,1,0   [2，5，10]
+    # 0,0,0,1,0,0,1,0,1,0,0,0   [3，6，8]
+    # ----------------------------------
+    # [1,1,1,1]
+
+    # dataset = [
+    #         [0,7,11],
+    #         [1,4,9],
+    #         [2,5,10],
+    #         [3,6,8]
+    #     ]
+    # label = [1,1,1,1]
+    # -------------------------------------------
+    # dataset = [
+    #         [0,7,11],
+    #         [0,4,8],
+    #         [0,3,7],
+    #         [0,5,6],
+    #         [0,10,11],
+    #         [1,7,11],
+    #         [2,7,11],
+    #         [5,7,11],
+    #         [1,2]
+    #     ]
+    # print(type(dataset))
+    #
+    # label = [1,1,1,1,1,1,-1,1,1]
+    # -------------------------------------------
